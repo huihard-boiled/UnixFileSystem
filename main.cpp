@@ -27,13 +27,13 @@ int main() {
 
 	fp = fopen(FILESYSTEMNAME, "rb+");
 
-	
+	//判断文件系统是否存在
 	if (fp == NULL) {
 		printf("Filesystem is not existing!\n");
 		CreateFilesystem(FILESYSTEMNAME);
 		fp = fopen(FILESYSTEMNAME, "rb+");
 	}
-	
+	//判断用户名，密码是否正确
 	while (1) {
 		printf("Please input your username: ");
 		scanf("%s", username);
@@ -46,7 +46,7 @@ int main() {
 			printf("Wrong username or password!\n");
 		}
 	}
-	
+	//加载目录到用户目录
 	if (strcmp(username, "root") == 0) {
 		curDir = GetInodeOfName(fp, -1, "/root/");
 	}
@@ -445,7 +445,7 @@ int main() {
 			printf("rmdir emptySubdirectory\n");
 			printf("mv srcFile dstFile\n");
 			printf("cp srcFile dstFile\n");
-			printf("rm file\n");
+			printf("rmdir file\n");
 			printf("ln srcFile dstFile\n");
 			printf("cat filename\n");
 			printf("passwd\n");

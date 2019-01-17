@@ -16,7 +16,7 @@ int Min(int a, int b) {
 }
 
 int StringSplitFront(char *s, char *s1, char *s2) {
-	
+	//如果s为空串
 	if (strcmp(s, "") == 0) {
 		strcpy(s1, "");
 		strcpy(s2, "");
@@ -28,14 +28,14 @@ int StringSplitFront(char *s, char *s1, char *s2) {
 		if (s[i] == '/') break;
 	}
 
-	
+	//如果s串中不包含'/'
 	if (s[i] != '/') {
 		strcpy(s1, s);
 		strcpy(s2, "");
 		return 1;
 	}
 
-	
+	//如果s串中包含'/'
 	for (i = 0; s[i] != '\0'; i++) {
 		if (s[i] == '/') break;
 	}
@@ -126,7 +126,7 @@ int GetInodeOfName(FILE *fp, int curInode,const char filePath[]) {
 
 	if (strcmp(filePath, "") == 0) return curInode;
 
-	if (curInode == -1) { 
+	if (curInode == -1) { //绝对路径
 		char s1[FILENAMELEN];
 		char s2[FILENAMELEN];
 		StringSplitFront(const_cast<char*>(filePath), s1, s2);
@@ -222,7 +222,7 @@ int GetInodeOfNameWithoutError(FILE *fp, int curInode, char filePath[]) {
 }
 
 int CreateDirectory(FILE *fp, int curInode,const char dirName[], const char username[], const char group[]) {
-	
+	//创建根目录
 	if (strcmp(dirName, "/") == 0) {
 		struct Superblock superblock = GetSuperblock(fp);
 		if (superblock.ptrRoot != -1) {
@@ -251,16 +251,16 @@ int CreateDirectory(FILE *fp, int curInode,const char dirName[], const char user
 		WriteInode(fp, inode, iInode);
 		WriteData(fp, iInode, dir, sizeof(struct Directory));
 
-		
+		//PrintInode(inode);
 		superblock = GetSuperblock(fp);
 		superblock.ptrRoot = iInode;
 
-		
+		//写入超级块
 		WriteSuperblock(fp, superblock);
 		return dir->ptrInode;
 	}
 
-	if (curInode == -1) {
+	if (curInode == -1) {//绝对路径
 		if (GetInodeOfName(fp, -1, const_cast<char*>(dirName)) != -1) {
 			printf("This directory already exists!\n");
 			return -1;
@@ -280,7 +280,7 @@ int CreateDirectory(FILE *fp, int curInode,const char dirName[], const char user
 
 		return CreateDirectory(fp, iInode, s2, username, group);
 	}
-	else { 
+	else { //相对路径
 		char tmp[FILENAMELEN];
 		strcpy(tmp, dirName);
 		tmp[strlen(tmp) - 1] = '\0';
@@ -313,7 +313,7 @@ int CreateDirectory(FILE *fp, int curInode,const char dirName[], const char user
 		strcpy(dirData.dirName, tmp);
 		dirData.ptrInode = iNewInode;
 
-		
+		//获取当前目录的数据
 		struct Inode inodeA = GetInode(fp, curInode);
 
 		char *data = (char *)malloc(inodeA.size + sizeof(struct Directory));
@@ -381,7 +381,7 @@ void ListDirectory(FILE* fp, int curInode,const char dirName[]) {
 }
 
 int CreateFile(FILE *fp, int curInode, const char fileName[], const char username[], const char group[]) {
-	if (curInode == -1) {
+	if (curInode == -1) {//绝对路径
 		if (GetInodeOfName(fp, -1, const_cast<char*>(fileName)) != -1) {
 			printf("File '%s' already exists!\n", fileName);
 			return -1;
@@ -425,6 +425,7 @@ int CreateFile(FILE *fp, int curInode, const char fileName[], const char usernam
 		strcpy(dirData.dirName, tmp);
 		dirData.ptrInode = iNewInode;
 
+		//获取当前目录的数据
 		struct Inode inodeA = GetInode(fp, curInode);
 
 		char *data = (char *)malloc(inodeA.size + sizeof(struct Directory));

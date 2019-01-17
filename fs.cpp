@@ -9,7 +9,7 @@
 #include "file.h"
 #include "user.h"
 
-
+//创建一个新的文件系统
 void CreateFilesystem(const char fsName[]) {
 	printf("Creating filesystem...\n");
 	FILE *fp;
@@ -18,12 +18,12 @@ void CreateFilesystem(const char fsName[]) {
 	char fillChar = 0;
 	fwrite(&fillChar, 0, sumSize, fp);
 
-	
+	//初始化超级块
 	printf("Initializing superblock...\n");
 	struct Superblock superblock;
 	InitSuperblock(&superblock);
 	WriteSuperblock(fp, superblock);
-	
+	//成组链接
 	int blockNumber = superblock.block[1];
 	for (; blockNumber <= DATABLOCKNUM; blockNumber += 100) {
 		int block[101];
@@ -44,7 +44,7 @@ void CreateFilesystem(const char fsName[]) {
 	}
 
 
-	
+	//创建根目录
 	printf("Creating directory '/'...\n");
 	int currentInode;
 	currentInode = CreateDirectory(fp, -1, "/", "root", "root");
@@ -58,7 +58,8 @@ void CreateFilesystem(const char fsName[]) {
 		printf("Create directory '/' successfully.\n");
 	}
 
-	
+	//PrintInode(GetInode(fp, currentInode));
+	//创建root目录
 	printf("Creating directory '/root/'...\n");
 	if (CreateDirectory(fp, currentInode, "root/", "root", "root") == -1) {
 		printf("Create directory '/root/' failed.\n");
@@ -68,7 +69,7 @@ void CreateFilesystem(const char fsName[]) {
 	else {
 		printf("Create directory '/root/' successfully.\n");
 	}
-	
+	//创建home目录
 	printf("Creating directory '/home/'...\n");
 	if (CreateDirectory(fp, currentInode, "home/", "root", "root") == -1) {
 		printf("Creating directory '/home/' failed.\n");
@@ -79,7 +80,7 @@ void CreateFilesystem(const char fsName[]) {
 		printf("Create directory '/home/' successfully.\n");
 	}
 
-	
+	//创建sys目录
 	printf("Creating directory '/sys/'...\n");
 	currentInode = CreateDirectory(fp, currentInode, "sys/", "root", "root");
 	if (currentInode == -1) {
@@ -91,7 +92,7 @@ void CreateFilesystem(const char fsName[]) {
 		printf("Create directory '/sys/' successfully.\n");
 	}
 
-	
+	//创建密码文件
 	struct User user[3];
 	user[0] = CreateUser("root", "root", "root");
 	user[1] = CreateUser("a", "a", "a");
